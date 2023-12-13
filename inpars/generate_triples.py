@@ -72,7 +72,7 @@ if __name__ == '__main__':
     if not os.path.exists(tmp_run):
         subprocess.run([
             'python3', '-m', 'pyserini.search.lucene',
-            '--threads', '8',
+            '--threads', '190',
             '--batch-size', str(args.batch_size),
             '--index', index,
             '--topics', f'{Path(args.output).parent}/topics-{args.dataset.replace("/","_")}.tsv',
