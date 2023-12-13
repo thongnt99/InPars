@@ -4,6 +4,7 @@ import random
 import pandas as pd
 from tqdm.auto import tqdm
 
+
 def load_corpus(dataset_name, source='ir_datasets'):
     texts = []
     docs_ids = []
@@ -22,9 +23,9 @@ def load_corpus(dataset_name, source='ir_datasets'):
         ):
             texts.append(
                 ftfy.fix_text(
-                    f"{doc.title} {doc.text}"
+                    f"{doc.title} {doc.body}"
                     if "title" in dataset.docs_cls()._fields
-                    else doc.text
+                    else doc.body
                 )
             )
             docs_ids.append(doc.doc_id)
@@ -65,6 +66,7 @@ def load_queries(dataset_name, source='ir_datasets'):
         from pyserini.search import get_topics
 
         for (qid, data) in get_topics(f'beir-v1.0.0-{dataset_name}-test').items():
-            queries[str(qid)] = ftfy.fix_text(data["title"])  # assume 'title' is the query
+            queries[str(qid)] = ftfy.fix_text(
+                data["title"])  # assume 'title' is the query
 
     return queries
