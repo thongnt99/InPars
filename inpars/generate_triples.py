@@ -109,7 +109,7 @@ if __name__ == '__main__':
                     continue
                 # pos_doc_text = corpus[pos_doc_id].replace('\n', ' ').strip()
                 # neg_doc_text = corpus[neg_doc_id].replace('\n', ' ').strip()
-                writer.writerow([query, pos_doc_id, neg_doc_id])
+                writer.writerow([qid, pos_doc_id, neg_doc_id])
                 n_samples_so_far += 1
                 if n_samples_so_far >= args.n_samples:
                     break
