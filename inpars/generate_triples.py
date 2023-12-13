@@ -63,7 +63,8 @@ if __name__ == '__main__':
                 n_no_query += 1
                 continue
 
-            query = ' '.join(row["query"].split())  # Removes line breaks and tabs.
+            # Removes line breaks and tabs.
+            query = ' '.join(row["query"].split())
             queries.append((query, None, row['doc_id']))
             tsv_writer.writerow([i, query])
 
@@ -71,12 +72,12 @@ if __name__ == '__main__':
     if not os.path.exists(tmp_run):
         subprocess.run([
             'python3', '-m', 'pyserini.search.lucene',
-                '--threads', '8',
-                '--batch-size', str(args.batch_size),
-                '--index', index,
-                '--topics', f'{Path(args.output).parent}/topics-{args.dataset}.tsv',
-                '--output', tmp_run,
-                '--bm25',
+            '--threads', '8',
+            '--batch-size', str(args.batch_size),
+            '--index', index,
+            '--topics', f'{Path(args.output).parent}/topics-{args.dataset}.tsv',
+            '--output', tmp_run,
+            '--bm25',
         ])
 
     results = {}
@@ -88,12 +89,14 @@ if __name__ == '__main__':
             results[qid].append(docid)
 
     with open(args.output, 'w') as fout:
-        writer = csv.writer(fout, delimiter='\t', lineterminator='\n', quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(fout, delimiter='\t',
+                            lineterminator='\n', quoting=csv.QUOTE_MINIMAL)
         for qid in tqdm(results, desc='Sampling'):
             hits = results[qid]
             query, log_probs, pos_doc_id = queries[int(qid)]
             n_examples += 1
-            sampled_ranks = random.sample(range(len(hits)), min(len(hits), args.n_samples + 1))
+            sampled_ranks = random.sample(
+                range(len(hits)), min(len(hits), args.n_samples + 1))
             n_samples_so_far = 0
             for (rank, neg_doc_id) in enumerate(hits):
                 if rank not in sampled_ranks:
@@ -102,11 +105,11 @@ if __name__ == '__main__':
                 if neg_doc_id not in corpus:
                     n_docs_not_found += 1
                     continue
-
-                pos_doc_text = corpus[pos_doc_id].replace('\n', ' ').strip()
-                neg_doc_text = corpus[neg_doc_id].replace('\n', ' ').strip()
-
-                writer.writerow([query, pos_doc_text, neg_doc_text])
+                if pos_doc_id == neg_doc_id:
+                    continue
+                # pos_doc_text = corpus[pos_doc_id].replace('\n', ' ').strip()
+                # neg_doc_text = corpus[neg_doc_id].replace('\n', ' ').strip()
+                writer.writerow([query, pos_doc_id, neg_doc_id])
                 n_samples_so_far += 1
                 if n_samples_so_far >= args.n_samples:
                     break
@@ -115,6 +118,7 @@ if __name__ == '__main__':
         print(f'{n_no_query} lines without queries.')
 
     if n_docs_not_found > 0:
-        print(f'{n_docs_not_found} docs returned by the search engine but not found in the corpus.')
+        print(
+            f'{n_docs_not_found} docs returned by the search engine but not found in the corpus.')
 
     print("Done!")
