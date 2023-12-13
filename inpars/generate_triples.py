@@ -33,17 +33,17 @@ if __name__ == '__main__':
     set_seed(args.seed)
 
     index = args.index
-    if os.path.exists(args.dataset):
-        if args.dataset.endswith('.csv'):
-            corpus = pd.read_csv(args.input)
-        else:
-            corpus = pd.read_json(args.input, lines=True)
-    else:
-        corpus = load_corpus(args.dataset, source=args.dataset_source)
-        index = f'beir-v1.0.0-{args.dataset}-flat'
+    # if os.path.exists(args.dataset):
+    #     if args.dataset.endswith('.csv'):
+    #         corpus = pd.read_csv(args.input)
+    #     else:
+    #         corpus = pd.read_json(args.input, lines=True)
+    # else:
+    #     corpus = load_corpus(args.dataset, source=args.dataset_source)
+    #     index = f'beir-v1.0.0-{args.dataset}-flat'
 
     # Convert to {'doc_id': 'text'} format
-    corpus = dict(zip(corpus['doc_id'], corpus['text']))
+    # corpus = dict(zip(corpus['doc_id'], corpus['text']))
 
     if os.path.isdir(index):
         searcher = LuceneSearcher(index)
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     n_docs_not_found = 0
     n_examples = 0
     queries = []
-    with open(args.input) as f, open(f'{Path(args.output).parent}/topics-{args.dataset}.tsv', 'w') as out:
+    with open(args.input) as f, open(f'{Path(args.output).parent}/topics-{args.dataset.replace("/","_")}.tsv', 'w') as out:
         tsv_writer = csv.writer(out, delimiter='\t', lineterminator='\n')
         for (i, line) in enumerate(f):
             row = json.loads(line.strip())
@@ -68,14 +68,14 @@ if __name__ == '__main__':
             queries.append((query, None, row['doc_id']))
             tsv_writer.writerow([i, query])
 
-    tmp_run = f'{Path(args.output).parent}/tmp-run-{args.dataset}.txt'
+    tmp_run = f'{Path(args.output).parent}/tmp-run-{args.dataset.replace("/","_")}.txt'
     if not os.path.exists(tmp_run):
         subprocess.run([
             'python3', '-m', 'pyserini.search.lucene',
             '--threads', '8',
             '--batch-size', str(args.batch_size),
             '--index', index,
-            '--topics', f'{Path(args.output).parent}/topics-{args.dataset}.tsv',
+            '--topics', f'{Path(args.output).parent}/topics-{args.dataset.replace("/","_")}.tsv',
             '--output', tmp_run,
             '--bm25',
         ])
@@ -102,9 +102,9 @@ if __name__ == '__main__':
                 if rank not in sampled_ranks:
                     continue
 
-                if neg_doc_id not in corpus:
-                    n_docs_not_found += 1
-                    continue
+                # if neg_doc_id not in corpus:
+                #     n_docs_not_found += 1
+                #     continue
                 if pos_doc_id == neg_doc_id:
                     continue
                 # pos_doc_text = corpus[pos_doc_id].replace('\n', ' ').strip()
