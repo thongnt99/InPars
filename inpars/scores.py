@@ -57,9 +57,9 @@ if __name__ == '__main__':
     parser.add_argument("--part", default=16, type=int,
                         help="which part to run")
     args = parser.parse_args()
-    query_path = "../lsr-entities/data/robust04/inparsv2/topics-robust04.tsv"
+    # query_path = "../lsr-entities/data/robust04/inparsv2/topics-robust04.tsv"
     queries = {}
-    with open(query_path, "r") as f:
+    with open(args.input, "r") as f:
         for line in tqdm(f, desc="Reading queries"):
             qid, qtext = line.strip().split("\t")
             queries[qid] = qtext
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     for pair, score in zip(pair_ids, pair_scores):
         score_dict[pair[0]][pair[1]] = score
     json.dumps(score_dict, open(
-        "../lsr-entities/data/robust04/inparsv2/monot5_score.json", "w"))
+        args.output, "w"))
     # for idx, synt_item in enumerate(dataset):
     # synt_item['score'] = query_scores[idx]
 
