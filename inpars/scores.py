@@ -25,8 +25,10 @@ from collections import defaultdict
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # parser.add_argument("--input", type=str, required=True,
-    #                     help="Input jsonl file with the synthetic queries to be filtered.")
+    parser.add_argument("--input", type=str, required=True,
+                        help="Input for queries")
+    parser.add_argument("--output", type=str, required=True,
+                        help="Output for queries")
     # parser.add_argument("--dataset", default=None, type=str,
     #                     help="Dataset name from BEIR collection.")
     # parser.add_argument('--dataset_source', default='ir_datasets',
@@ -52,18 +54,9 @@ if __name__ == '__main__':
                         help="Whether to use FP16 weights during inference.")
     parser.add_argument("--batch_size", default=16, type=int,
                         help="Batch size for inference.")
-
+    parser.add_argument("--part", default=16, type=int,
+                        help="which part to run")
     args = parser.parse_args()
-    # assert args.filter_strategy in ['scores', 'reranker']
-
-    # dataset = read_synthetic_data(args)
-
-    # if args.filter_strategy == "scores":
-    #     for line in tqdm(dataset):
-    #         line['score'] = np.mean(line['log_probs'])
-    # else:
-    # corpus = load_corpus(args.dataset, source=args.dataset_source)
-    # corpus = dict(zip(corpus['doc_id'], corpus['text']))
     query_path = "../lsr-entities/data/robust04/inparsv2/topics-robust04.tsv"
     queries = {}
     with open(query_path, "r") as f:
@@ -79,8 +72,9 @@ if __name__ == '__main__':
     with open(triplet_path, "r") as f:
         for line in tqdm(f, desc="Reading triplets"):
             qid, pos_id, neg_id = line.strip().split("\t")
-            q2doc[qid].add(pos_id)
-            q2doc[qid].add(neg_id)
+            if qid in queries:
+                q2doc[qid].add(pos_id)
+                q2doc[qid].add(neg_id)
     pairs = []
     pair_ids = []
     for qid in q2doc:
