@@ -64,20 +64,20 @@ if __name__ == '__main__':
     # else:
     # corpus = load_corpus(args.dataset, source=args.dataset_source)
     # corpus = dict(zip(corpus['doc_id'], corpus['text']))
-    query_path = "data/robust04/inparsv2/topics-robust04.tsv"
+    query_path = "../lsr-entities/data/robust04/inparsv2/topics-robust04.tsv"
     queries = {}
     with open(query_path, "r") as f:
-        for line in f:
+        for line in tqdm(f, desc="Reading queries"):
             qid, qtext = line.strip().split("\t")
             queries[qid] = qtext
     dataset = ir_datasets.load("disks45/nocr/trec-robust-2004")
     docs = {}
-    for doc in dataset.docs_iter():
+    for doc in tqdm(dataset.docs_iter(), desc="Reading documents"):
         docs[doc.doc_id] = doc.title + " " + doc.body.replace("\n", " ")
-    triplet_path = "data/robust04/inparsv2/triplet_ids.tsv"
+    triplet_path = "../lsr-entities/data/robust04/inparsv2/triplet_ids.tsv"
     q2doc = defaultdict(set())
     with open(triplet_path, "r") as f:
-        for line in f:
+        for line in tqdm(f, desc="Reading triplets"):
             qid, pos_id, neg_id = line.strip().split("\t")
             q2doc[qid].add(pos_id)
             q2doc[qid].add(neg_id)
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     for pair, score in zip(pair_ids, pair_scores):
         score_dict[pair[0]][pair[1]] = score
     json.dumps(score_dict, open(
-        "data/robust04/inparsv2/monot5_score.json", "w"))
+        "../lsr-entities/data/robust04/inparsv2/monot5_score.json", "w"))
     # for idx, synt_item in enumerate(dataset):
     # synt_item['score'] = query_scores[idx]
 
