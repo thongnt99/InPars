@@ -92,7 +92,7 @@ if __name__ == '__main__':
     score_dict = defaultdict(dict)
     for pair, score in zip(pair_ids, pair_scores):
         score_dict[pair[0]][pair[1]] = score
-    json.dumps(score_dict, open(
+    json.dump(score_dict, open(
         args.output, "w"))
     # for idx, synt_item in enumerate(dataset):
     # synt_item['score'] = query_scores[idx]
