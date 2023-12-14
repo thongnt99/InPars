@@ -75,7 +75,7 @@ if __name__ == '__main__':
     for doc in tqdm(dataset.docs_iter(), desc="Reading documents"):
         docs[doc.doc_id] = doc.title + " " + doc.body.replace("\n", " ")
     triplet_path = "../lsr-entities/data/robust04/inparsv2/triplet_ids.tsv"
-    q2doc = defaultdict(set())
+    q2doc = defaultdict(set)
     with open(triplet_path, "r") as f:
         for line in tqdm(f, desc="Reading triplets"):
             qid, pos_id, neg_id = line.strip().split("\t")
